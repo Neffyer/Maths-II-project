@@ -6,6 +6,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import matplotlib.pyplot as plt
 
 import numpy as np
+import math
 
 customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -28,7 +29,7 @@ class Arcball(customtkinter.CTk):
         self.geometry(f"{1100}x{580}")
         self.resizable(False, False)
 
-        self.grid_columnconfigure((0,1), weight=0   )
+        self.grid_columnconfigure((0,1), weight=0)
         self.grid_rowconfigure((0,1), weight=1)
         self.grid_rowconfigure(2, weight=0)
 
@@ -230,6 +231,93 @@ class Arcball(customtkinter.CTk):
         Event triggered function on the event of a push on the button Reset
         """
         pass
+
+    def Eaa2rotM(self, angle, axis):
+        '''
+        Devuelve la matriz de rotación R capaz de rotar vectores un ángulo 'angle' (en radiane*s) alrededor del eje 'axis'
+        '''
+        
+        R = np.zeros((3,3))
+
+        uuT = np.array([[axis[0]*axis[0], axis[0]*axis[1], axis[0]*axis[2]], [axis[1]*axis[0], axis[1]*axis[1], axis[1]*axis[2]], [axis[2]*axis[0], axis[2]*axis[1], axis[2]*axis[2]]])
+
+        Ux = np.array([[0, -axis[2], axis[1]], [axis[2], 0, -axis[0]], [-axis[1], axis[0], 0]])
+
+        R = np.identity(3)*math.cos(angle) + (1 - math.cos(angle)) * uuT + Ux * math.sin(angle)
+
+        return R
+    
+    def eAngles2rotM(self,yaw,pitch,roll): #psi, theta, phi
+        '''
+        Given a set of Euler angles returns the rotation matrix R
+        '''
+
+        yaw = yaw * (math.pi/180)
+        pitch = pitch * (math.pi/180)
+        roll = roll * (math.pi/180)
+
+        if (abs(math.cos(pitch)) < 1E-8):
+      
+            if (math.sin(pitch) == -1):
+
+                r11 = 0
+                r12 = -math.sin(roll+yaw)
+                r13 = -math.cos(roll+yaw)
+
+                r21 = 0
+                r22 = math.cos(roll+yaw)
+                r23 = -math.sin(roll+yaw)
+
+                r31 = 1
+                r32 = 0
+                r33 = 0
+
+            elif (math.sin(pitch) == 1):
+
+                r11 = 0
+                r12 = math.sin(roll-yaw)
+                r13 = math.cos(roll-yaw)
+
+                r21 = 0
+                r22 = math.cos(roll-yaw)
+                r23 = -math.sin(roll-yaw)
+
+                r31 = -1
+                r32 = 0
+                r33 = 0
+
+        else:
+
+            r11 = math.cos(pitch) * math.cos(yaw)
+            r12 = math.cos(yaw) * math.sin(pitch) * math.sin(roll) - math.cos(roll) * math.sin(yaw)
+            r13 = math.cos(yaw) * math.cos(roll) * math.sin(pitch) + math.sin(yaw) * math.sin(roll)
+
+            r21 = math.cos(pitch) * math.sin(yaw)
+            r22 = math.sin(yaw) * math.sin(pitch) * math.sin(roll) + math.cos(roll) * math.cos(yaw)
+            r23 = math.sin(yaw) * math.sin(pitch) * math.cos(roll) - math.cos(yaw) * math.sin(roll)
+
+            r31 = -math.sin(pitch)
+            r32 = math.cos(pitch) * math.sin(roll)
+            r33 = math.cos(pitch) * math.cos(roll)
+
+        R = np.array([[r11,r12,r13], [r21,r22,r23],[r31,r32,r33]])
+    
+        return R
+    
+    def quatToRotMatrix(self,qt):
+            
+        qt = qt / np.linalg.norm(qt)
+
+        q0 = qt[0]
+        q = qt[1:]
+
+        R = np.zeros((3,3))
+
+        qx = np.array([[0,-q[2][0],q[1][0]], [q[2][0],0,-q[0][0]], [-q[1][0],q[0][0],0]], dtype = object)
+
+        R = (q0**2 - q.transpose() @ q) * np.identity(3) + 2 * q @ q.transpose() + 2 * q0 * qx
+
+        return R
 
     
     def apply_AA(self):
