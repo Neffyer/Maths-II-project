@@ -246,7 +246,7 @@ class Arcball(customtkinter.CTk):
 
         return R
     
-    def rotMat2Eaa(self, R):
+    def rotM2Eaa(self, R):
         '''
         Returns the principal axis and angle encoded in the rotation matrix R
         '''
@@ -257,7 +257,7 @@ class Arcball(customtkinter.CTk):
 
         if (angle < 1E-8):
       
-            axis = np.array([1, 0, 0]) # Random axis, as the identity matrix does a rotation of 0 radians.
+            axis = np.array([1, 0, 0]) # Axis aleatorio, ya que la matriz identidad hace una rotación de 0 radianes.
 
         elif (abs(angle) == np.pi):
 
@@ -330,7 +330,62 @@ class Arcball(customtkinter.CTk):
     
         return R
     
-    def quatToRotMatrix(self, qt):
+    def rotM2eAngles(self,R): #psi, theta, phi
+        '''
+        Given a rotation matrix R returns a set of Euler angles 
+        '''
+        
+        if (R[2][0] == 1):
+
+            pitch = np.asin(-R[2][0])
+
+            roll = 0
+
+            yaw = np.atan2(R[0][1], R[0][2])
+
+        elif (R[2][0] == -1):
+
+            pitch = np.asin(-R[2][0])
+
+            roll = 0
+
+            yaw = np.atan2(R[0][1], R[0][2])
+
+        else:
+
+            pitch = np.asin(-R[2][0])
+
+            roll = np.atan2(R[2][1] / np.cos(pitch), R[2][2] / np.cos(pitch))
+
+            yaw = np.atan2(R[1][0] / np.cos(pitch), R[0][0] / np.cos(pitch))
+
+        
+        return (yaw, pitch, roll)
+    
+    def Eaa2Quat(self, axis, angle):
+
+        qt = np.zeros((4,1))
+
+        qt[0] = np.cos(angle/2)
+        qt[1] = np.sin(angle/2) * axis[0]
+        qt[2] = np.sin(angle/2) * axis[1]
+        qt[3] = np.sin(angle/2) * axis[2]
+
+        return qt
+    
+    def quat2Eaa(self, qt):
+        
+        axis = np.zeros(3)
+
+        angle = 2 * np.acos(qt[0])
+
+        axis[0] = 1/np.sin(angle/2) * qt[1]
+        axis[1] = 1/np.sin(angle/2) * qt[2]
+        axis[2] = 1/np.sin(angle/2) * qt[3]
+
+        return (axis, angle)
+    
+    def quat2RotMatrix(self, qt):
             
         qt = qt / np.linalg.norm(qt)
 
@@ -345,7 +400,10 @@ class Arcball(customtkinter.CTk):
 
         return R
     
-    def twoVectorsToQuat(self, v0, v1):
+    # Construye un quaternion unitario que representa la rotación
+    # de m0 a m1. No es necesario normalizar los vectores de entrada.
+    
+    def twoVectors2Quat(self, v0, v1):
     
         v = np.cross(v0, v1)
 
