@@ -610,66 +610,35 @@ class Arcball(customtkinter.CTk):
 
         pass
     
-
     def apply_AA(self):
         """
         Event triggered function on the event of a push on the button button_AA
         """
-        ax1 = float(self.entry_AA_ax1.get())
-        ax2 = float(self.entry_AA_ax2.get())
-        ax3 = float(self.entry_AA_ax3.get())
-        angle = np.radians(float(self.entry_AA_angle.get()))
-
-        axis = np.array([ax1, ax2, ax3])
-        self.updateEaa(angle, axis)
-        self.updateRotM(self.R)   
-        self.disableRotM()
-        self.update_cube()
+        #Example on hot to get values from entries:
+        angle = self.entry_AA_angle.get()
+        #Example string to number
+        print(float(angle)*2)
 
     
     def apply_rotV(self):
         """
         Event triggered function on the event of a push on the button button_rotV 
         """
-        rotV1 = float(self.entry_rotV_1.get())
-        rotV2 = float(self.entry_rotV_2.get())
-        rotV3 = float(self.entry_rotV_3.get())
-
-        rotVect = np.array([rotV1,rotV2,rotV3])
-        self.updateRotVector(rotVect)
-        self.updateRotM(self.R)   
-        self.disableRotM()
-        self.update_cube()
+        pass
 
     
     def apply_EA(self):
         """
         Event triggered function on the event of a push on the button button_EA
         """
-        roll = np.radians(float(self.entry_EA_roll.get()))
-        pitch = np.radians(float(self.entry_EA_pitch.get()))
-        yaw = np.radians(float(self.entry_EA_yaw.get()))
+        pass
 
-        self.updateEAngles(roll,pitch,yaw)
-        self.updateRotM(self.R)   
-        self.disableRotM()
-        self.update_cube()
     
     def apply_quat(self):
         """
         Event triggered function on the event of a push on the button button_quat
         """
-        q0 = float(self.entry_quat_0.get())
-        q1 = float(self.entry_quat_1.get())
-        q2 = float(self.entry_quat_2.get())
-        q3 = float(self.entry_quat_3.get())
-
-        quat = np.array([[q0], [q1], [q2], [q3]])
-
-        self.updateQuat(quat)
-        self.updateRotM(self.R)   
-        self.disableRotM()
-        self.update_cube()
+        pass
 
     
     def onclick(self, event):
