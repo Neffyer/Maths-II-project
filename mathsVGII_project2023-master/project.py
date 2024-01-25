@@ -228,7 +228,9 @@ class Arcball(customtkinter.CTk):
         '''
         Devuelve la matriz de rotación R capaz de rotar vectores un ángulo 'angle' (en radiane*s) alrededor del eje 'axis'
         '''
-        
+        angle = np.radians(angle)
+        axis = axis / np.linalg.norm(axis,2)#Normalizar los ejes
+
         R = np.zeros((3,3))
 
         uuT = np.array([[axis[0] * axis[0], axis[0] * axis[1], axis[0] * axis[2]],
@@ -615,11 +617,25 @@ class Arcball(customtkinter.CTk):
         Event triggered function on the event of a push on the button button_AA
         """
         #Example on hot to get values from entries:
-        angle = self.entry_AA_angle.get()
+        #angle = self.entry_AA_angle.get()
         #Example string to number
-        print(float(angle)*2)
+        #print(float(angle)*2)
+        """"""
+        # Obtener valores de ángulo y eje desde las entradas
+        angle = float(self.entry_AA_angle.get())
+        axis = [float(self.entry_AA_ax1.get()), float(self.entry_AA_ax2.get()), float(self.entry_AA_ax3.get())]
 
-    
+        # Convertir ángulo y eje a matriz de rotación
+        rot_matrix = self.Eaa2rotM(angle, axis)
+
+        # Actualizar la matriz de rotación y la visualización
+        self.R = rot_matrix
+        self.updateRotM(self.R)
+
+        
+        self.M = self.R.dot(self.M) # Modifica la matriz de vértices con la nueva matriz de rotación
+        self.update_cube() #Actualiza el cubo
+
     def apply_rotV(self):
         """
         Event triggered function on the event of a push on the button button_rotV 
