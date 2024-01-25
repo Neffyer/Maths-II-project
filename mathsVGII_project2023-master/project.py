@@ -592,7 +592,7 @@ class Arcball(customtkinter.CTk):
         self.R = np.eye(3)
 
         self.updateRotM(self.R)
-        self.rotMdisabled()
+        self.disableRotM()
 
         self.M = np.array(
             [[-1, -1, 1],   #Nodo 0
