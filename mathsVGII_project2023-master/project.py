@@ -383,6 +383,19 @@ class Arcball(customtkinter.CTk):
 
         return (axis, angle)
     
+    def rotV2Eaa(rot_vector):
+        # Compute the angle of rotation
+        angle = np.linalg.norm(rot_vector)
+
+        # Avoid division by zero
+        if angle == 0:
+            axis = np.array([1.0, 0.0, 0.0])
+        else:
+            # Compute the unit vector representing the rotation axis
+            axis = rot_vector / angle
+
+        return axis, angle
+
     def quat2RotMatrix(self, qt):
             
         qt = qt / np.linalg.norm(qt)
@@ -655,13 +668,26 @@ class Arcball(customtkinter.CTk):
         Event triggered function on the event of a push on the button button_rotV 
         """
         # Obtener valores de vector de rotación desde las entradas
-        rot_vector = [float(self.entry_rotV_1.get()), float(self.entry_rotV_2.get()), float(self.entry_rotV_3.get())]
+        v1 = float(self.entry_rotV_1.get())
+        v2 = float(self.entry_rotV_2.get())
+        v3 = float(self.entry_rotV_3.get())
+        rotV = np.array([[v1],[v2],[v3]])
 
-        # Convertir vector de rotación a matriz de rotación
-        rot_matrix = self.rotation_vector_to_matrix(rot_vector)
+        self.updateRotVector(rotV)
 
-        # Actualizar la matriz de rotación y la visualización
+        axis, angle = self.rotV2Eaa(rotV)
+
+        rot_matrix = self.Eaa2rotM(angle, axis)
+        self.updateEaa(angle, axis)
+
         self.R = rot_matrix
+
+        yaw, pitch, roll = self.rotM2eAngles(self.R)
+        self.updateEAngles(roll * (180/np.pi), pitch * (180/np.pi), yaw * (180/np.pi))
+
+        q = self.Eaa2Quat(axis,angle)
+        self.updateQuat(q)
+
         self.updateRotM(self.R)
 
         self.M = self.R.dot(self.M)  # Modifica la matriz de vértices con la nueva matriz de rotación
