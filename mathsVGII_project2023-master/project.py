@@ -709,14 +709,32 @@ class Arcball(customtkinter.CTk):
         """
         Event triggered function on the event of a push on the button button_quat
         """
-        q = self.Eaa2Quat(axis,angle)
-        self.updateQuat(q)
+        q0 = float(self.entry_quat_0.get())
+        q1 = float(self.entry_quat_1.get())
+        q2 = float(self.entry_quat_2.get())
+        q3 = float(self.entry_quat_3.get())
+        self.quat = np.array([[q0], [q1], [q2], [q3]])
+        self.updateQuat(self.quat)
+
+        axis, angle = self.quat2Eaa(self.quat)
+
+        rot_matrix = self.Eaa2rotM(angle, axis)
+        self.updateEaa(angle, axis)
+        
+        # Actualizar la matriz de rotación y la visualización
+        
+        self.R = rot_matrix
+
+        yaw, pitch, roll = self.rotM2eAngles(self.R)
+        self.updateEAngles(roll * (180/np.pi), pitch * (180/np.pi), yaw * (180/np.pi))
+
+        rotV = angle * axis
+        self.updateRotVector(rotV)
 
         self.updateRotM(self.R)
 
         self.M = self.R.dot(self.M) # Modifica la matriz de vértices con la nueva matriz de rotación
         self.update_cube() #Actualiza el cubo
-        pass
 
     
     def onclick(self, event):
