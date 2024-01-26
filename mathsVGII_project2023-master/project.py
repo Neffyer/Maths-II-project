@@ -627,6 +627,8 @@ class Arcball(customtkinter.CTk):
         # Convertir ángulo y eje a matriz de rotación
         rot_matrix = self.Eaa2rotM(angle, axis)
 
+        self.updateEaa(angle, axis)
+        
         # Actualizar la matriz de rotación y la visualización
         
         self.R = rot_matrix
@@ -642,7 +644,7 @@ class Arcball(customtkinter.CTk):
         #Actualizar Quat
         q = self.Eaa2Quat(axis,angle)
         self.updateQuat(q)
-
+        
         self.updateRotM(self.R)
 
         self.M = self.R.dot(self.M) # Modifica la matriz de vértices con la nueva matriz de rotación
@@ -672,13 +674,48 @@ class Arcball(customtkinter.CTk):
         """
         Event triggered function on the event of a push on the button button_EA
         """
-        pass
+        # Obtener valores de ángulo y eje desde las entradas
+        yaw = float(self.entry_EA_yaw.get())
+        pitch = float(self.entry_EA_pitch.get())
+        roll = float(self.entry_EA_roll.get())
+
+        self.updateEAngles(roll * (180/np.pi), pitch * (180/np.pi), yaw * (180/np.pi))
+
+        R = self.eAngles2rotM(yaw,pitch,roll)
+
+        axis, angle = self.rotM2eaa(R)
+
+        rot_matrix = self.Eaa2rotM(angle, axis)
+        self.updateEaa(angle, axis)
+        
+        # Actualizar la matriz de rotación y la visualización
+        
+        self.R = rot_matrix
+
+        rotV = angle * axis
+        self.updateRotVector(rotV)
+        #Actualizar Quat
+        q = self.Eaa2Quat(axis,angle)
+        self.updateQuat(q)
+
+
+        self.updateRotM(self.R)
+
+        self.M = self.R.dot(self.M)  # Modifica la matriz de vértices con la nueva matriz de rotación
+        self.update_cube()
 
     
     def apply_quat(self):
         """
         Event triggered function on the event of a push on the button button_quat
         """
+        q = self.Eaa2Quat(axis,angle)
+        self.updateQuat(q)
+
+        self.updateRotM(self.R)
+
+        self.M = self.R.dot(self.M) # Modifica la matriz de vértices con la nueva matriz de rotación
+        self.update_cube() #Actualiza el cubo
         pass
 
     
