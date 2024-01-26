@@ -414,7 +414,7 @@ class Arcball(customtkinter.CTk):
         return R
     
     # Construye un quaternion unitario que representa la rotación
-    # de m0 a m1. No es necesario normalizar los vectores de entrada.
+    # de v0 a v1. No es necesario normalizar los vectores de entrada.
     
     def twoVectors2Quat(self, v0, v1):
     
