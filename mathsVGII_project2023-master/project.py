@@ -652,6 +652,19 @@ class Arcball(customtkinter.CTk):
         """
         Event triggered function on the event of a push on the button button_rotV 
         """
+        # Obtener valores de vector de rotación desde las entradas
+        rot_vector = [float(self.entry_rotV_1.get()), float(self.entry_rotV_2.get()), float(self.entry_rotV_3.get())]
+
+        # Convertir vector de rotación a matriz de rotación
+        rot_matrix = self.rotation_vector_to_matrix(rot_vector)
+
+        # Actualizar la matriz de rotación y la visualización
+        self.R = rot_matrix
+        self.updateRotM(self.R)
+
+        self.M = self.R.dot(self.M)  # Modifica la matriz de vértices con la nueva matriz de rotación
+        self.update_cube()  # Actualiza el cubo
+        
         pass
 
     
