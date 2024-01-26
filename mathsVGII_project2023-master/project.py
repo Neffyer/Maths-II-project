@@ -76,7 +76,7 @@ class Arcball(customtkinter.CTk):
         self.entry_AA_ax3.insert(0,"0.0")
         self.entry_AA_ax3.grid(row=2, column=1, padx=(5, 0), pady=(5, 10), sticky="ew")
 
-        self.label_AA_angle = customtkinter.CTkLabel(self.tabview.tab("Axis angle"), text="Angle:")
+        self.label_AA_angle = customtkinter.CTkLabel(self.tabview.tab("Axis angle"), text="Angle(rads):")
         self.label_AA_angle.grid(row=3, column=0, padx=(120,0), pady=(10, 20),sticky="w")
         self.entry_AA_angle = customtkinter.CTkEntry(self.tabview.tab("Axis angle"))
         self.entry_AA_angle.insert(0,"0.0")
@@ -228,7 +228,6 @@ class Arcball(customtkinter.CTk):
         '''
         Devuelve la matriz de rotación R capaz de rotar vectores un ángulo 'angle' (en radiane*s) alrededor del eje 'axis'
         '''
-        angle = np.radians(angle)
         axis = axis / np.linalg.norm(axis,2)#Normalizar los ejes
 
         R = np.zeros((3,3))
@@ -629,10 +628,23 @@ class Arcball(customtkinter.CTk):
         rot_matrix = self.Eaa2rotM(angle, axis)
 
         # Actualizar la matriz de rotación y la visualización
+        
         self.R = rot_matrix
+
+        #Actualizar las demás
+        #Actualizar Euler Angles
+        yaw, pitch, roll = self.rotM2eAngles(self.R)
+        self.updateEAngles(roll * (180/np.pi), pitch * (180/np.pi), yaw * (180/np.pi))
+        #Actualizar RotVect
+        axis_array = np.array(axis)
+        rotV = angle * axis_array
+        self.updateRotVector(rotV)
+        #Actualizar Quat
+        q = self.Eaa2Quat(axis,angle)
+        self.updateQuat(q)
+
         self.updateRotM(self.R)
 
-        
         self.M = self.R.dot(self.M) # Modifica la matriz de vértices con la nueva matriz de rotación
         self.update_cube() #Actualiza el cubo
 
